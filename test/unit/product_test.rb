@@ -62,4 +62,19 @@ class ProductTest < ActiveSupport::TestCase
     assert_equal I18n.translate('activarecord.errors.messages.taken'), product.errors[:title].join('; ') #уже было использовано
   end
 
+  test "product name length must be greater than 10" do
+    product = Product.new(description: "yyy", image_url: "zzz.jpg")
+    product.title = "My Book"
+    assert product.invalid?
+    assert_equal "is too short (minimum is 10 characters)",
+           product.errors[:title].join('; ')
+         # должна быть больше или равна 10
+    product.title = ""
+    assert product.invalid?
+    assert_equal "can't be blank; is too short (minimum is 10 characters)",
+           product.errors[:title].join('; ')
+         # должна быть больше или равна 0.01
+    product.title = "My Book Title"
+    assert product.valid?
+  end
 end
