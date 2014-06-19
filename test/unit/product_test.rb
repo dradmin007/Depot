@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class ProductTest < ActiveSupport::TestCase
+  fixtures :products
   def new_product(image_url)
     Product.new(title: "My Book Title", description: "yyy", price: 1, image_url: image_url)
   end
@@ -28,10 +29,10 @@ class ProductTest < ActiveSupport::TestCase
     #assert_equal "must by greater than or equal to 0.01",
     #       product.errors[:price].join('; ')
          # должна быть больше или равна 0.01
-    product.price = 1 
+    product.price = 1
     assert product.valid?
   end
-  
+
   test "image url" do
     # url image
     ok = %w{ fred.gif fred.jpg fred.png FRED.JPG FRED.Jpg
@@ -46,4 +47,19 @@ class ProductTest < ActiveSupport::TestCase
       assert new_product(name).invalid?, "#{name} shouldn't be valid"
     end
   end
+
+  test "product is not valid without a unique title" do
+    # если у товара нет уникального названия, то он недопустим
+    product = Product.new(title: products(:ruby).title, description: "yyyy", price: 1, image_url: "fred.gif")
+    assert !product.save
+    assert_equal "has already been taken", product.errors[:title].join('; ') #уже было использовано
+  end
+
+  test "product is not valid without a unique title - i18n" do
+    # если у товара нет уникального названия, то он недопустим
+    product = Product.new(title: products(:ruby).title, description: "yyyy", price: 1, image_url: "fred.gif")
+    assert !product.save
+    assert_equal I18n.translate('activarecord.errors.messages.taken'), product.errors[:title].join('; ') #уже было использовано
+  end
+
 end
