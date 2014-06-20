@@ -6,13 +6,19 @@
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 </head>
-<body class='<%= controller.controller_name %>'>
+<body class="<%= controller.controller_name %>">
   <div id="banner">
     <%= image_tag("logo.png") %>
     <%= @page_title || "Pragmatic Bookself" %>
   </div>
   <div id="columns">
     <div id="side">
+      <% if @cart %>
+      <%= hidden_div_if(@cart.line_items.empty?, id: 'cart') do %>
+        <%= render @cart %>
+      <% end %>
+    <% end %>
+
       <ul>
         <li><a href="#">Home</a></li>
         <li><a href="#">Questions</a></li>
